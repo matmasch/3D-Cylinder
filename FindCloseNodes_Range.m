@@ -3,9 +3,9 @@ function [closeNodes]=FindCloseNodes_Range(nodeCoordinates,nodeCount)
 %%% 3D find close nodes
 voxel=zeros(nodeCount,2);
 
-gap=40e-9;gapSquared=gap^2;
+gap=50e-9;gapSquared=gap^2;
 gridsize=1/(gap); %setting voxel size
-
+ii=0; jj=0;
 maxx=max(ceil(gridsize*nodeCoordinates(:,1))); maxy=max(ceil(gridsize*nodeCoordinates(:,2))); maxxy=maxx*maxy;
 
 closeNodes=zeros(nodeCount,2);
@@ -33,7 +33,7 @@ sizenodes=size(sortNodes,1);
                                 if sortNodes(s,2)==sortNodes(ss,2)
                                  jj(counter)=sortNodes(ss,1);
                                  ii(counter)=sortNodes(s,1);
-                                 dist(counter)=(   (nodeCoordinates(sortNodes(s),1)-nodeCoordinates(sortNodes(ss),1)).^2 + (nodeCoordinates(sortNodes(s),2)-nodeCoordinates(sortNodes(ss),2) ).^2 );
+                                 dist(counter)=(   (nodeCoordinates(sortNodes(s),1)-nodeCoordinates(sortNodes(ss),1)).^2 + (nodeCoordinates(sortNodes(s),2)-nodeCoordinates(sortNodes(ss),2) ).^2 + + (nodeCoordinates(sortNodes(s),3)-nodeCoordinates(sortNodes(ss),3) ).^2);
                                     if dist(counter)<gapSquared
                                         counter=counter+1;
                                     end

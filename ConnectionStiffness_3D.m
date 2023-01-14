@@ -74,8 +74,8 @@ jj_local=[Ni+1 Ni+1 Ni+1 Ni+1 Ni+1 Ni+1 Ni+1 Ni+1 Ni+1 Ni+1 Ni+1 Ni+1 Ni+2 Ni+2 
   
       
   
-   %Ac=sparse(jj_local(:), ii_local(:), Kg(:), GDof, GDof);
-   Ac=fsparse(ii_local(:), jj_local(:), Kg(:), [GDof, GDof]);
+   Ac=fsparse(jj_local(:), ii_local(:), Kg(:), [GDof, GDof]);
+%%AA=sparse(ii_local(:), jj_local(:), Kg(:), GDof, GDof);
 
    
 

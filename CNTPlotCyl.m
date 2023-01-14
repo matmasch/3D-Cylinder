@@ -21,10 +21,14 @@ domain=-0; %micron
 % %     view(3)
 % % end
 % % subplot(2,2,2)
+
+
+hold on
 for p=1:numberBeams; 
-    pp=p:numberBeams:nodeCount;
+    tt=p
+    pp=t:numberBeams:nodeCount;
     plot3(nodeCoordinates(pp,1)*1e6+domain,nodeCoordinates(pp,2)*1e6+domain, nodeCoordinates(pp,3)*1e6,'LineWidth',0.1);
-    axis([-5 5 -5 5 0 5])
+    %axis([-5 5 -5 5 0 5])
     figureHandle = gcf;
     set(gca,'FontSize',22)
     set(findall(gcf,'type','text'),'FontSize',22);
@@ -36,7 +40,10 @@ for p=1:numberBeams;
     view(2)
 end
 
-       plotname=strcat(title,num2str(t));   
+
+%plot3(nodeCoordinates(:,1)*1e6+domain,nodeCoordinates(:,2)*1e6+domain, nodeCoordinates(:,3)*1e6,'.');
+       
+plotname=strcat(title,num2str(t));   
        saveas(gcf,fullfile(fname,plotname),'png');
 
             close()

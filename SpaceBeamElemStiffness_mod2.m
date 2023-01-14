@@ -188,7 +188,8 @@ y(144,:)=(  (4.*CZy.^2.*EI)./LL + (4.*CZz.^2.*EI)./LL + (CZx.^2.*G.*J)./LL  )';
 
 
 
-K=sparse(jj_local(:), ii_local(:), y(:), GDof, GDof);
+%K=sparse(jj_local(:), ii_local(:), y(:), GDof, GDof);
+K=fsparse(jj_local, ii_local, y, GDof);
 
 end
 

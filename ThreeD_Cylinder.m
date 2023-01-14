@@ -1,18 +1,20 @@
 clear
 E=1e12; rout=5e-9; ri=3.5e-9; A=pi*(rout^2-ri^2); Ic=pi/2*(rout^4-ri^4); EA=E*A; EI=E*Ic; G=5e11; 
 title=input('Name of Run ','s');
-fname = 'C:\Users\maschmannm\OneDrive - University of Missouri\Documents\MATLAB\ImageFolder\Junk\';
+fname = 'C:\Users\maschmannm\Documents\MATLAB\Image Folder\Junk\';
 %fname ='/home/mmaschma/data/3Dcode/Output/test10';
-steps=30;% Number of time steps
-diam=2;% Span of the substrate lengthwise(micron)
-length=1;% Span of the substrate breadthwise(micron)
+steps=200;% Number of time steps
+diam=5;         h_span=diam*1e-6;% Span of the substrate lengthwise(micron)
+length=3;      v_span=length*1e-6% Span of the substrate breadthwise(micron)
 
-numberBeamsx=40;% Number of CNTs along perimeter
-numberBeamsy=10;% Number of CNTs to be modeled breadthwise
+numberBeamsx=150;% Number of CNTs along perimeter
+numberBeamsy=50;% Number of CNTs to be modeled breadthwise
 truncatedTime=5000;
 
-ang_stdev=5;% Choose 0,5,10, percent for parametric study
-rate_stdev=5;% Choose 0, 10, 20 percent for parametric study
+plotint=10;
+
+ang_stdev=10;% Choose 0,5,10, percent for parametric study
+rate_stdev=10;% Choose 0, 10, 20 percent for parametric study
 avgRate=60e-9;% Average growth per time step (meters)
 numberBeams=numberBeamsx*numberBeamsy;% Total number of Beams on the Substrate
 ContinuousPlot=1;% 0=plotting off.  1=plotting on
@@ -35,7 +37,10 @@ Ic=pi/2*(ro.^4-ri.^4)';
 EA=E.*A; EI=E.*Ic;
 L=rate'; plotcount=0; oldCloseNodes=[1 2];
 reactionForce=zeros(6*numberBeams,1);% Element force vector
+closeNodesOld=[];
+
 for t=1:steps %% Growing CNT forest for a quantity of "steps" time steps
+tic()
     if t>1
         t
         for e=element-numberBeams+1:element;
@@ -47,16 +52,13 @@ for t=1:steps %% Growing CNT forest for a quantity of "steps" time steps
     end
 
     GDof=6*nodeCount;  
-    %%closeNodes=FindCNTMeshGrid(nodeCoordinates,nodeCount,numberBeams,t,GDof) 
-     %rmax=max(ro);
      rmax=rout;
-     entercloseNodes=0
-     %[gap, sep,closeNodes]=FindCloseNodesCycl2(nodeCoordinates,nodeCount,numberBeams,t,rmax);
-     %[gap, sep,closeNodes] =FindCloseNodesSparseCyl2(nodeCoordinates,nodeCount,numberBeamsx,numberBeamsy,t,rmax)     ;
-     %[gap, sep,closeNodes] =FindCloseNodesSparse(nodeCoordinates,nodeCount,numberBeams,t,rmax); 
-     %[gap, sep,closeNodes] =FindCloseNodesSparse2(nodeCoordinates,nodeCount,numberBeamsx,numberBeamsy,t,rmax);
-     [gap, sep,closeNodes] =FindCloseNodes3DTruncated_1(nodeCoordinates,nodeCount,numberBeamsx,numberBeamsy,t,steps,oldCloseNodes,truncatedTime);  
-     size(closeNodes)
+
+    %[closeNodes]=FindCloseNodes_RangeDec22_3D(nodeCoordinates,nodeCount)  ;
+    %[closeNodes] =FindCloseNodesPar(nodeCoordinates,nodeCount,numberBeams) ;    
+    [closeNodes]=FindCloseNodes_Voxel_Par(nodeCoordinates,nodeCount);  
+
+ size(closeNodes)
              if t>truncatedTime-1
        oldCloseNodes=closeNodes;
            end
@@ -131,6 +133,10 @@ buildK=1
  
 if closeNodes ~= 0  
     
+    closeNodes=[closeNodes;closeNodesOld];
+    closeNodes=unique(closeNodes,'rows');
+    [closeNodesOld]=closeNodes;   
+ 
     NumberBars=size(closeNodes,1);
     xb=nodeCoordinates(closeNodes(:,2),1)-nodeCoordinates(closeNodes(:,1),1);
     yb=nodeCoordinates(closeNodes(:,2),2)-nodeCoordinates(closeNodes(:,1),2);
@@ -144,15 +150,10 @@ if closeNodes ~= 0
             CXx=xb./ll;
             CYx=yb./ll;
             CZx=zb./ll;
-    
-            
-            
-            
+       
     [Ac,vdwk]=ConnectionStiffness_3D(rout,j,closeNodes,GDof,beamType,CXx,CYx,CZx);
     K=K+Ac; 
-    
-    
-    
+
 end
     contactingNodes(t)=size(closeNodes,1);
 
@@ -207,8 +208,8 @@ end
     reactionForce=zeros(GDof, 1);
     reactionForce=K*U;
     
-    %%%% REPOSITIONING NODES %%%%/
-    %repositionStart=0
+ %%%% REPOSITIONING NODES %%%%/
+
         ii=1:nodeCount-numberBeams; %%Shifts Upper Nodes Up
         nodeCoordinates(ii,1)=nodeCoordinates(ii,1)+U(6*(ii-1)+1);
         nodeCoordinates(ii,2)=nodeCoordinates(ii,2)+U(6*(ii-1)+2);
@@ -223,34 +224,49 @@ end
     
     currentCount=nodeCount;
     
-     for kk=currentCount+1:currentCount+numberBeams
-%%        if t<steps ;
-             nodeCount=nodeCount+1;
-             element=element+1 ;
- %%        end
-         %%kk=currentCount+1:currentCount+numberBeams
-         nodeCoordinates(kk,1)=nucleationSite(kk-currentCount,1);
-         nodeCoordinates(kk,2)=nucleationSite(kk-currentCount,2);
-         nodeCoordinates(kk,3)=nucleationSite(kk-currentCount,3);
-         elementNodes(element,1)=element;
-         elementNodes(element,2)=nodeCount;
-    end
+% % % % %      for kk=currentCount+1:currentCount+numberBeams
+% % % % % %%        if t<steps ;
+% % % % %              nodeCount=nodeCount+1;
+% % % % %              element=element+1 ;
+% % % % %  %%        end
+% % % % %          %%kk=currentCount+1:currentCount+numberBeams
+% % % % %          nodeCoordinates(kk,1)=nucleationSite(kk-currentCount,1);
+% % % % %          nodeCoordinates(kk,2)=nucleationSite(kk-currentCount,2);
+% % % % %          nodeCoordinates(kk,3)=nucleationSite(kk-currentCount,3);
+% % % % %          elementNodes(element,1)=element;
+% % % % %          elementNodes(element,2)=nodeCount;
+% % % % %     end
+
+    kk=(currentCount+1:currentCount+numberBeams)';
+    nodeCoordinates(kk,1)=nucleationSite(kk-currentCount,1);
+    nodeCoordinates(kk,2)=nucleationSite(kk-currentCount,2);
+    nodeCoordinates(kk,3)=nucleationSite(kk-currentCount,3);
+
+         ii = nodeCount+1:nodeCount+numberBeams;
+         jj = element+1:element+numberBeams;
+         elementNodes(jj,1)=jj';
+         elementNodes(jj,2)=ii';
+         
+         nodeCount=nodeCount+numberBeams;
+         element=element+numberBeams;
+
+
     %repositionEnd=1
 %reactionForce = ForceComp(K,U,element,numberBeams, nodeCoordinates,closeNodes,elementNodes); %To be used for internal residual stress
 %reactionForce=sparse(reactionForce);
 
-if ContinuousPlot==1
-   plotcount=plotcount+1;
-   if plotcount==10
-       h_span=1e-6;
-   CNTPlotCyl(fname,avgRate, steps, h_span, numberBeams,ContinuousPlot,nodeCount,nodeCoordinates,t,title,totalCompress, compressiveLoad);
+
+   if rem(t,plotint)==0
+   h_span=1e-6;
+   %CNTPlotBW((fname,avgRate, steps, h_span,v_span, numberBeams,ContinuousPlot,nodeCount,nodeCoordinates,t,title,totalCompress, compressiveLoad,numberBeamsx,numberBeamsy,inactiveNodes);
+    CNTPlotBW(fname,avgRate, steps, h_span,v_span, numberBeams,nodeCount,nodeCoordinates,t,title,numberBeamsx,numberBeamsy);
    plotcount=0;
    save([fullfile(fname,title),'.mat']) % Saves workspace for further manipulation
    end
-end
+
     
 
-
+time=toc()
 
 end
 f=1:numberBeams:element-numberBeams;

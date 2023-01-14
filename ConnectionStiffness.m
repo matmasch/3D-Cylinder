@@ -215,9 +215,7 @@ function [AA,vdwk]=ConnectionStiffness(E,Ac,Ic,LL,Cx,Cy,Cz,G,EI,sizeClose,closeN
    Kg(144,:)=0;
 
    
-   %AA=sparse(jj_local(:), ii_local(:), Kg(:), GDof, GDof);
-   
-   AA=fsparse(jj_local(:), ii_local(:), Kg(:), [GDof,GDof]);
+   AA=sparse(jj_local(:), ii_local(:), Kg(:), GDof, GDof);
 
 
    
