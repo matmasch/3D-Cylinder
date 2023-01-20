@@ -9,6 +9,8 @@ color = [0 0 0] + array;
 scatter3(nodeCoordinates(activeNodes,1)*1e6,nodeCoordinates(activeNodes,2)*1e6, nodeCoordinates(activeNodes,3)*1e6,0.5,color, 'filled')
 hold on         
 axis off
+xlim([-25 25])
+ylim([-25 25])
             daspect([1 1 1])
             figureHandle = gcf;
             set(gca,'FontSize',22)

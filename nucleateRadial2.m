@@ -8,10 +8,11 @@ for o=1:numberBeamsRad %  Indexes at a constant angle first
     for count=1:numberBeamsy % Then indexes along the length
     % uniformly spaced nucleation points along 1/4 perimeter and allows buffer of 3 CNTs at edges
         index=(count-1)*numberBeamsx+o;
-        origin(index,1)=radius*cos(-pi/2+2*pi/(numberBeamsRad-1)*(o-1)); %x-Direction
-        origin(index,2)=radius*sin(-pi/2+2*pi/(numberBeamsRad-1)*(o-1)); %y-Direction
-        origin(index,3)=length*10^-6*(count-1)/numberBeamsy; %Length is in the z-direction
-        phi(index)= pi/2+ .2*rand;
+        angle(index) = 2*pi/(numberBeamsRad-1)*(o-1);%+.005*rand;
+        origin(index,1)=radius*cos(-pi/2+(angle(index))); %x-Direction
+        origin(index,2)=radius*sin(-pi/2+(angle(index))); %y-Direction
+        origin(index,3)=length*10^-6*(count-1)/numberBeamsy+15e-9*rand; %Axial Length is in the z-direction
+        phi(index)= pi/2;
     end
 end
 
@@ -20,7 +21,7 @@ end
      Sigma_ang = [(ang_stdev*pi/180)^2;]; 
      R_ang = chol(Sigma_ang);
      rand_ang(ii) = repmat(mu_ang,1) + randn(1)*R_ang;
-     %phi(ii)=pi/2+ (rand-0.5)*rand_ang(ii); %Used to be ang(ii)=
+     phi(ii)=pi/2+ (rand-0.5)*rand_ang(ii); %Used to be ang(ii)=
      ro(ii)=rout;%%30e-9+8e-9*rand()
      
      mu_rate=avgRate;

@@ -1,19 +1,18 @@
 clear
-E=1e12; rout=5e-9; ri=3.5e-9; A=pi*(rout^2-ri^2); Ic=pi/2*(rout^4-ri^4); EA=E*A; EI=E*Ic; G=5e11; 
+E=1e12; rout=5e-9; ri=rout*0.85; A=pi*(rout^2-ri^2); Ic=pi/2*(rout^4-ri^4); EA=E*A; EI=E*Ic; G=5e11; 
 title=input('Name of Run ','s');
 fname = 'C:\Users\maschmannm\Documents\MATLAB\Image Folder\Junk\';
 %fname ='/home/mmaschma/data/3Dcode/Output/test10';
 steps=200;% Number of time steps
-diam=5;         h_span=diam*1e-6;% Span of the substrate lengthwise(micron)
-length=3;      v_span=length*1e-6% Span of the substrate breadthwise(micron)
+diam=8;        h_span=diam*1e-6;    %      ate lengthwise(micron)
+length=10;      v_span=length*1e-6   % Span of the substrate breadthwise(micron)
 
-numberBeamsx=150;% Number of CNTs along perimeter
+numberBeamsx=120;% Number of CNTs along perimeter
 numberBeamsy=50;% Number of CNTs to be modeled breadthwise
-truncatedTime=5000;
 
 plotint=10;
 
-ang_stdev=10;% Choose 0,5,10, percent for parametric study
+ang_stdev=5;% Choose 0,5,10, percent for parametric study
 rate_stdev=10;% Choose 0, 10, 20 percent for parametric study
 avgRate=60e-9;% Average growth per time step (meters)
 numberBeams=numberBeamsx*numberBeamsy;% Total number of Beams on the Substrate
@@ -59,9 +58,7 @@ tic()
     [closeNodes]=FindCloseNodes_Voxel_Par(nodeCoordinates,nodeCount);  
 
  size(closeNodes)
-             if t>truncatedTime-1
-       oldCloseNodes=closeNodes;
-           end
+
      leaveCloseNodes=1
     %%closeNodes=FindCloseNodesEachCNT(nodeCoordinates,nodeCount,numberBeams,t,GDof)  
       
@@ -90,7 +87,17 @@ tic()
     ya=nodeCoordinates(elementNodes(:,2),2)-nodeCoordinates(elementNodes(:,1),2); % y component of the length of the element 
     za=nodeCoordinates(elementNodes(:,2),3)-nodeCoordinates(elementNodes(:,1),3); % z componet of the length of the element
     
-       NDF=6; % number of DOFs per node
+     if PeriodicBoundary==1;
+         crossedl=find(za>v_span/2);% moves across left boundary
+         za(crossedl)=za(crossedl)-v_span;     
+         crossedr=find( za <-v_span/2) ;
+         za(crossedr)=za(crossedr)+v_span;
+     end 
+    
+    
+      
+    
+    NDF=6; % number of DOFs per node
       NTT=nodeCount*NDF;% total number of DOFs
       %K=zeros(NTT,NTT);
       tt=zeros(3,3);
@@ -141,6 +148,15 @@ if closeNodes ~= 0
     xb=nodeCoordinates(closeNodes(:,2),1)-nodeCoordinates(closeNodes(:,1),1);
     yb=nodeCoordinates(closeNodes(:,2),2)-nodeCoordinates(closeNodes(:,1),2);
     zb=nodeCoordinates(closeNodes(:,2),3)-nodeCoordinates(closeNodes(:,1),3);
+
+     if PeriodicBoundary==1;
+         crossedl=find(zb>v_span/2);% moves across left boundary
+         zb(crossedl)=zb(crossedl)-v_span;     
+         crossedr=find( zb <-v_span/2) ;
+         zb(crossedr)=zb(crossedr)+v_span;
+     end 
+
+
     ndf=3;%number of DOFs per node in the bar element
     ntt=2*NumberBars*ndf;%total number of DOFs
 
@@ -223,6 +239,14 @@ end
         elementNodes(element,2)=nodeCount;
     
     currentCount=nodeCount;
+
+      if PeriodicBoundary==1;
+         crossedzf=find(nodeCoordinates(:,3)<0);% moves across front
+         nodeCoordinates(crossedzf,3)=nodeCoordinates(crossedzf,3)+v_span; 
+         
+         crossedzb=find(nodeCoordinates(:,3)>v_span);% moves across back
+         nodeCoordinates(crossedzb,3)=nodeCoordinates(crossedzb,3)-v_span;
+      end
     
 % % % % %      for kk=currentCount+1:currentCount+numberBeams
 % % % % % %%        if t<steps ;
