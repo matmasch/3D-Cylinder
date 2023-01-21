@@ -6,6 +6,12 @@ The main CNT forest synthesis function is ThreeD_Cylinder.m. You will want to mo
 If you do not already have fsparse installed in your working directory, run make.m FIRST.
 
 
+
+
+
+
+
+
 clear
 E=1e12; rout=5e-9; ri=rout*0.85; A=pi*(rout^2-ri^2); Ic=pi/2*(rout^4-ri^4); EA=E*A; EI=E*Ic; G=5e11; 
 title=input('Name of Run ','s');
