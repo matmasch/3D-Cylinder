@@ -1,5 +1,7 @@
 # 3D-Cylinder
-The main synthesis fucntion is ThreeD_Cylinder.m
+This matlab code will synthesize a CNT forest around the perimeter of a cylinde, representing a microfiber.
+
+The main CNT forest synthesis function is ThreeD_Cylinder.m
 
 If you do not already have fsparse installed in your working directory, run make.m FIRST.
 
