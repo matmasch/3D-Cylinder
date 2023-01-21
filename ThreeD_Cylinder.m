@@ -4,8 +4,11 @@ title=input('Name of Run ','s');
 fname = 'C:\Users\maschmannm\Documents\MATLAB\Image Folder\Junk\';
 %fname ='/home/mmaschma/data/3Dcode/Output/test10';
 steps=200;% Number of time steps
-diam=8;        h_span=diam*1e-6;    %      ate lengthwise(micron)
-length=10;      v_span=length*1e-6   % Span of the substrate breadthwise(micron)
+diam=8;            % fiber diameter (micron)
+length=10;         % long axis of fiber(micron)
+
+h_span=diam*1e-6; 
+v_span=length*1e-6;
 
 numberBeamsx=120;% Number of CNTs along perimeter
 numberBeamsy=50;% Number of CNTs to be modeled breadthwise
