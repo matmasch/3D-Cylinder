@@ -11,7 +11,7 @@ for o=1:numberBeamsRad %  Indexes at a constant angle first
         angle(index) = 2*pi/(numberBeamsRad-1)*(o-1);%+.005*rand;
         origin(index,1)=radius*cos(-pi/2+(angle(index))); %x-Direction
         origin(index,2)=radius*sin(-pi/2+(angle(index))); %y-Direction
-        origin(index,3)=length*10^-6*(count-1)/numberBeamsy+15e-9*rand; %Axial Length is in the z-direction
+        origin(index,3)=length*10^-6*(count-1)/numberBeamsy +15e-9*rand; %Axial Length is in the z-direction
         phi(index)= pi/2;
     end
 end
